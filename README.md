@@ -1,8 +1,8 @@
-# virtrepo
+# kvm-virt-repo
 
 ## Deploy and manager KVM virtual machines.
 
-    virtrepo
+    kvm-virt-repo
     |-- deploy-vm.conf            # configuration file used by deploy-vm.py
     |-- deploy-vm.py              # script used to create a vm
     |-- deploy-vm-ceph.py         # script used to create a vm in ceph environtment

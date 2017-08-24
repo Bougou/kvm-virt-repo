@@ -95,7 +95,7 @@ def make_parser():
                            dest='vmnet', metavar='vmnet', nargs='+', required=True) 
     net_group.add_argument('--gw', help="vm's gateway", dest='vmgateway',
                            metavar='vmgateway')
-    net_group.add_argument('--ns', help="vm's name server. It accepts multiple"
+    net_group.add_argument('--ns', help="vm's name server. It accepts multiple "
                            "name servers separated by comma, "
                            "like 8.8.8.8,114.114.114.114", 
                            dest='vmnameserver', metavar='vmnameserver')
