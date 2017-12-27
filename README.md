@@ -1,5 +1,12 @@
 # kvm-virt-repo
 
+## Quick Guide
+
+```bash
+python deploy-vm.py --conf deploy-vm.conf --name vm-centos6 --tmpl centos-6.8-x64 --net br0/192.168.1.100/24
+python deploy-vm-centos7.py --conf deploy-vm.conf --name vm-centos7 --tmpl centos-7.2-x64 --net virbr1/172.18.28.226/24
+```
+
 ## Deploy and manager KVM virtual machines.
 
     kvm-virt-repo
