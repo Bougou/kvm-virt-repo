@@ -572,13 +572,13 @@ try:
     fstab_file = mountpoint + "/etc/fstab"
     if args.vmswapsize > 0:
         entry_string = "/dev/vdb\t\tswap\t\t\tswap\tdefaults\t0 0\n"
-    with open(fstab_file, 'a') as f:
-        f.write(entry_string)
+        with open(fstab_file, 'a') as f:
+            f.write(entry_string)
 
     if args.vmdatasize > 0:
         entry_string = "/dev/vdc\t\t/web\t\t\txfs\tdefaults\t0 0\n"
-    with open(fstab_file, 'a') as f:
-        f.write(entry_string)
+        with open(fstab_file, 'a') as f:
+            f.write(entry_string)
 
     logger.debug("Modify network configuration.")
     # vmnet = ['br0/172.30.0.3/255.255.255.0', 'virbr0/192.168.44.3/24']
