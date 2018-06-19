@@ -180,6 +180,16 @@ if args.conf_file:
 # Parse command line arguments.
 args = parser.parse_args()
 
+base_dir = os.path.dirname(__file__)
+
+if not os.path.isabs(args.vmdeploypath):
+    vmdeploypath = os.path.join(base_dir, args.vmdeploypath)
+
+if not os.path.isabs(args.vmtmplpath):
+    vmtmplpath = os.path.join(base_dir, args.vmtmplpath)
+
+if not os.path.isabs(args.vmcreatelogdir):
+    vmcreatelogdir = os.path.join(base_dir, args.vmcreatelogdir)
 
 if args.vmswapsize is None:
     args.vmswapsize = args.vmmemsize
@@ -195,12 +205,11 @@ else:
     vmcpunumber_max = args.vmcpunumber * 2
 
 
-
 vmuuid = str(uuid.uuid4())
 
-vmtmplfile = os.path.join(args.vmtmplpath, args.vmtmpl + '.raw')
-vmdir =  os.path.join(args.vmdeploypath, args.vmname)
+vmtmplfile = os.path.join(vmtmplpath, args.vmtmpl + '.raw')
 
+vmdir =  os.path.join(vmdeploypath, args.vmname)
 vmxmlfile = os.path.join(vmdir, args.vmname + '.xml')
 vmsysfile = os.path.join(vmdir, args.vmname + '.sys')
 vmswapfile = os.path.join(vmdir, args.vmname + '.swap')
@@ -209,14 +218,14 @@ vmdatafile = os.path.join(vmdir, args.vmname + '.data')
 # Generate six-bits random number.
 taskid = str(random.random()).split('.')[1][0:6]
 # The log file likes /repo/logs/539658_create_vm1.log
-vmcreatelog = os.path.join(args.vmcreatelogdir, taskid + '_create_' +
+vmcreatelog = os.path.join(vmcreatelogdir, taskid + '_create_' +
                            args.vmname + '.log')
 
 print(args)
 print("=" * 20)
 
-if not os.path.exists(args.vmcreatelogdir):
-    os.mkdir(args.vmcreatelogdir, 0755)
+if not os.path.exists(vmcreatelogdir):
+    os.mkdir(vmcreatelogdir, 0755)
 
 open(vmcreatelog, 'a').close()
 os.chmod(vmcreatelog, 0640)

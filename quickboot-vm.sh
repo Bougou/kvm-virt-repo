@@ -17,8 +17,10 @@ vmcpu=${4:-2}
 vmmem=${5:-4}
 vmpath=${6:-''}
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"&& pwd)"
+
 _args=" \
-  --conf ./deploy-vm.conf \
+  --conf ${SCRIPT_DIR}/deploy-vm.conf \
   --tmpl "$vmtmpl" \
   --name "$vmname" \
   --cpu "$vmcpu" \
@@ -33,4 +35,4 @@ fi
 
 echo $_args
 
-python ./deploy-vm-centos7.py $_args
+python ${SCRIPT_DIR}/deploy-vm-centos7.py $_args
