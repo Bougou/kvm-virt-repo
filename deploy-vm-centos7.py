@@ -54,6 +54,8 @@ def make_parser():
                         metavar='vmname', required=True)
     base_group.add_argument('--tmpl', help='the template used to create the vm',
                         dest='vmtmpl', metavar='vmtmpl')
+    base_group.add_argument('--path', help='specify the path where vm stores',
+                        dest='vmdeploypath')
 
     # Options about VM's capacity.
     cap_group = parser.add_argument_group('Capacity (CPU and Memory)')
@@ -666,4 +668,3 @@ all_vars.update(vars())
 
 logger.debug("VM's summary infomation.")
 logger.debug(end_desc_str(all_vars))
-

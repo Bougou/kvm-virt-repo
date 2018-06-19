@@ -22,7 +22,7 @@ from lxml import etree
 def check_negative(value):
     ivalue = int(value)
     if ivalue <= 0:
-        raise argparse.ArgumentTypeError("%s must be an valid positive int" 
+        raise argparse.ArgumentTypeError("%s must be an valid positive int"
                              "value." % value)
     return ivalue
 
@@ -38,8 +38,8 @@ def check_empty(value):
     if svalue == '':
         raise argparse.ArgumentTypeError("Empty value is not allowed.")
     return svalue
-        
-        
+
+
 # Factory function to make parser.
 def make_parser():
     parser = argparse.ArgumentParser(description='Create a virtual machine',
@@ -50,22 +50,24 @@ def make_parser():
     base_group = parser.add_argument_group('Basic information')
     base_group.add_argument('--conf', help='specify the configuartion file',
                         dest='conf_file', required=True)
-    base_group.add_argument('--name', help="vm's name.", dest='vmname', 
+    base_group.add_argument('--name', help="vm's name.", dest='vmname',
                         metavar='vmname', required=True)
-    base_group.add_argument('--tmpl', help='the template used to create the vm', 
+    base_group.add_argument('--tmpl', help='the template used to create the vm',
                         dest='vmtmpl', metavar='vmtmpl')
-    
+    base_group.add_argument('--path', help='specify the path where vm stores',
+                        dest='vmdeploypath')
+
     # Options about VM's capacity.
     cap_group = parser.add_argument_group('Capacity (CPU and Memory)')
     cap_group.add_argument('--cpu', help="vm's cpu number. "
-                           "Must be positive. (Default: %(default)s)", 
-                           dest='vmcpunumber', metavar='vmcpunumber', 
+                           "Must be positive. (Default: %(default)s)",
+                           dest='vmcpunumber', metavar='vmcpunumber',
                            default=1, type=check_negative)
     cap_group.add_argument('--mem', help="vm's memory size. Unit: GB. "
                            "Must be positive. (Default: %(default)s)",
-                           dest='vmmemsize', metavar='vmmemsize', 
+                           dest='vmmemsize', metavar='vmmemsize',
                            default=1, type=check_negative)
-    
+
     # Options about VM's disks.
     disk_group = parser.add_argument_group('Disk (System Disk, Swap Disk, '
                                            'Data Disk)')
@@ -75,10 +77,10 @@ def make_parser():
                             metavar='vmsyssize', type=check_time10)
     disk_group.add_argument('--swap', help="vm's swap disk size. Unit: GB. "
                             "Equals to size of 'vmmemsize' if unspecified. "
-                            "Must be positive.", dest='vmswapsize', 
+                            "Must be positive.", dest='vmswapsize',
                             metavar='vmswapsize', type=check_negative)
     disk_group.add_argument('--data', help="vm's data disk size. Unit: GB "
-                            "Must be multiple of 10.", dest='vmdatasize', 
+                            "Must be multiple of 10.", dest='vmdatasize',
                             metavar='vmdatasize', type=check_time10)
 
     # Options about VM's network
@@ -92,30 +94,30 @@ def make_parser():
                            "you want to create an interface but do NOT want "
                            "specify ip address. Each 'vmnet' becomes vm's "
                            "network interface, like eth[0,1,2..]",
-                           dest='vmnet', metavar='vmnet', nargs='+', required=True) 
+                           dest='vmnet', metavar='vmnet', nargs='+', required=True)
     net_group.add_argument('--gw', help="vm's gateway", dest='vmgateway',
                            metavar='vmgateway')
     net_group.add_argument('--ns', help="vm's name server. It accepts multiple "
                            "name servers separated by comma, "
-                           "like 8.8.8.8,114.114.114.114", 
+                           "like 8.8.8.8,114.114.114.114",
                            dest='vmnameserver', metavar='vmnameserver')
-    
+
     # Other options.
     other_group = parser.add_argument_group('Others')
     other_group.add_argument('--vncpass', help="Password to access the "
                              "console through vnc. Only 8 letters are "
                              "significant for VNC passwords. It means NOT "
-                             "use password if this option is unspecified.", 
-                             dest='vncpass', metavar='vncpassword', 
+                             "use password if this option is unspecified.",
+                             dest='vncpass', metavar='vncpassword',
                              type=check_empty)
     other_group.add_argument('--crsv', help="whether to use cpu reservation. "
                              "Default is NOT use cpu reservation, specify "
                              "this option means to use cpu reservation. "
                              "CPU Reservation allows you to increase cpu "
-                             "number online. It actually allocate twice the " 
+                             "number online. It actually allocate twice the "
                              "number of 'vmcpunumber' derived from option "
                              "'--cpu'.",
-                             dest='vmcpuresv', action='store_true', 
+                             dest='vmcpuresv', action='store_true',
                              default=False)
     other_group.add_argument('--mrsv', help="whether to use mem reservation. "
                              "Default is NOT use mem reservation, specify "
@@ -124,7 +126,7 @@ def make_parser():
                              "memory size online. It actually allocate twice "
                              "the number of 'vmmemsize' derived from option "
                              "'--mem'.",
-                             dest='vmmemresv', action='store_true', 
+                             dest='vmmemresv', action='store_true',
                              default=False)
     other_group.add_argument('--pubkey', help="ssh public key files. It "
                              "accepts multiple files separated by comma. "
@@ -132,7 +134,7 @@ def make_parser():
                              "path name (relative to current directory). "
                              "Like '/root/id_rsa.pub,other_key_file'. "
                              "Those public key files's content will be added "
-                             "to vm's /root/.ssh/authorized_keys.", 
+                             "to vm's /root/.ssh/authorized_keys.",
                              dest='pubkey', metavar='pubkeyfile')
 
     return parser
@@ -146,12 +148,12 @@ if len(sys.argv) == 1:
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--conf', help='specify the configuartion file', 
+parser.add_argument('--conf', help='specify the configuartion file',
                     dest='conf_file', required=True)
 
-# By default, the argument strings are taken from sys.argv. 
-# Until now, only one argument '--conf' are added to parser, so 
-# parse_known_args() just return the populated namespace (args) and 
+# By default, the argument strings are taken from sys.argv.
+# Until now, only one argument '--conf' are added to parser, so
+# parse_known_args() just return the populated namespace (args) and
 # the list of remaining argument.
 args, remaining_argv = parser.parse_known_args()
 # 'args' only contain 'conf_file'
@@ -170,7 +172,7 @@ if args.conf_file:
     options_default = dict(config.items('DEFAULT'))
 
     # Translate 'vmnet' from string (separated by comma) to list.
-    if 'vmnet' in options_default: 
+    if 'vmnet' in options_default:
         options_default['vmnet'] = options_default['vmnet'].split(',')
 
     parser.set_defaults(**options_default)
@@ -207,7 +209,7 @@ vmdatafile = os.path.join(vmdir, args.vmname + '.data')
 # Generate six-bits random number.
 taskid = str(random.random()).split('.')[1][0:6]
 # The log file likes /repo/logs/539658_create_vm1.log
-vmcreatelog = os.path.join(args.vmcreatelogdir, taskid + '_create_' + 
+vmcreatelog = os.path.join(args.vmcreatelogdir, taskid + '_create_' +
                            args.vmname + '.log')
 
 print(args)
@@ -236,13 +238,13 @@ logger.addHandler(consolehandler)
 # Check whether template file exist.
 if not os.path.isfile(vmtmplfile):
     logger.warn("Try to find compressed file of {0}.".format(vmtmplfile))
-    comp_vmtmplfile = vmtmplfile + ".tar.gz" 
+    comp_vmtmplfile = vmtmplfile + ".tar.gz"
     if not os.path.isfile(comp_vmtmplfile):
         logger.error(vmtmplfile + " is not a valid template file.")
         sys.exit(1)
     else:
         try:
-            subprocess.call(['tar', '-Sxzf', comp_vmtmplfile, '-C', 
+            subprocess.call(['tar', '-Sxzf', comp_vmtmplfile, '-C',
                             os.path.dirname(comp_vmtmplfile)],
                             stdout=open(os.devnull, 'wb'))
         except:
@@ -258,7 +260,7 @@ def cleanfailedcreate():
     logger.debug("Cleaning failed create.")
     shutil.rmtree(vmdir)
     sys.exit(1)
-    
+
 
 ##############################
 #         Create VM          #
@@ -325,7 +327,7 @@ x_on_crash.text = 'restart'
 
 # Define time keeping.
 x_clock = etree.SubElement(x_domain, 'clock', offset='localtime')
-# localtime: guest clock will be synchronized to the host's configured 
+# localtime: guest clock will be synchronized to the host's configured
 # timezone when booted.
 
 # Define devices provided to the guest domain.
@@ -339,7 +341,7 @@ def defdiskxml(parent, disk_source, disk_device):
     x_disk = etree.SubElement(parent, 'disk', type='file', device='disk')
     x_source = etree.SubElement(x_disk, 'source', file=disk_source)
     x_target = etree.SubElement(x_disk, 'target', dev=disk_device, bus='virtio')
- 
+
 # Define disk info to xml file.
 defdiskxml(x_devices, vmsysfile, 'vda')
 defdiskxml(x_devices, vmswapfile, 'vdb')
@@ -351,8 +353,8 @@ def defnetxml(parent, net_source):
     x_interface = etree.SubElement(parent, 'interface', type='bridge')
     x_source = etree.SubElement(x_interface, 'source', bridge=net_source)
     x_model = etree.SubElement(x_interface, 'model', type='virtio')
-    
-# Define network info to xml file. 
+
+# Define network info to xml file.
 # vmnet = ['br0/172.30.0.3/255.255.255.0', 'virbr0/192.168.44.3/24']
 for netitem in args.vmnet:
     br_if = netitem.split('/')[0]
@@ -366,10 +368,10 @@ if args.vncpass:
     x_graphics = etree.SubElement(x_devices, 'graphics', type='vnc',
                                   autoport='yes', passwd=args.vncpass)
 else:
-    x_graphics = etree.SubElement(x_devices, 'graphics', type='vnc', 
+    x_graphics = etree.SubElement(x_devices, 'graphics', type='vnc',
                                   autoport='yes')
-    
-x_listen = etree.SubElement(x_graphics, 'listen', 
+
+x_listen = etree.SubElement(x_graphics, 'listen',
                           type='address', address='0.0.0.0')
 
 
@@ -389,22 +391,22 @@ logger.debug("Suceeded to generate the xml file for guest domain.")
 # Prepare the sys disk.
 # Copy from template file.
 try:
-    subprocess.call(['cp', '--sparse=always', vmtmplfile, vmsysfile], 
+    subprocess.call(['cp', '--sparse=always', vmtmplfile, vmsysfile],
                     stdout=open(os.devnull, 'wb'))
 except:
-    logger.error("Failed to copy from " + vmtmplfile + " to " + vmsysfile 
+    logger.error("Failed to copy from " + vmtmplfile + " to " + vmsysfile
                  + ". " + str(sys.exc_info()[1]))
     cleanfailedcreate()
 else:
     logger.debug("Suceeded to copy from " + vmtmplfile + " to " + vmsysfile)
-    
+
 # Resize the sys disk.
 try:
-    subprocess.call(['qemu-img', 'resize', vmsysfile, 
-                    str(args.vmsyssize) + "G"], 
+    subprocess.call(['qemu-img', 'resize', vmsysfile,
+                    str(args.vmsyssize) + "G"],
                     stdout=open(os.devnull, 'wb'))
 except:
-    logger.error("Failed to resize: " + vmsysfile     
+    logger.error("Failed to resize: " + vmsysfile
                  + ". " + str(sys.exc_info()[1]))
     cleanfailedcreate()
 else:
@@ -414,8 +416,8 @@ else:
 
 # Prepare the swap disk.
 try:
-    subprocess.call(['qemu-img', 'create', '-f', 'raw', vmswapfile, 
-                    str(args.vmswapsize) + "G"], 
+    subprocess.call(['qemu-img', 'create', '-f', 'raw', vmswapfile,
+                    str(args.vmswapsize) + "G"],
                     stdout=open(os.devnull, 'wb'))
 except:
     logger.error("Failed to create swap disk: " + vmswapfile
@@ -425,7 +427,7 @@ else:
     logger.debug("Suceeded to create swap disk: " + vmswapfile)
 
 try:
-    subprocess.call(['mkswap', '-f', vmswapfile], 
+    subprocess.call(['mkswap', '-f', vmswapfile],
                     stdout=open(os.devnull, 'wb'))
 except:
     logger.error("Failed to mkswap: " + vmswapfile
@@ -466,12 +468,12 @@ def file_to_loop(file):
 def unfile_to_loop(loopdev):
     subprocess.call(['losetup', '-d', loopdev],
                     stdout=open(os.devnull, 'wb'))
-    
+
 
 # Helper function to create device maps of an image file.
 def file_to_loop_kpartx(file):
     loopdev = file_to_loop(file)
-    subprocess.call(['kpartx', '-avs', '-pp', loopdev], 
+    subprocess.call(['kpartx', '-avs', '-pp', loopdev],
                     stdout=open(os.devnull, 'wb'))
     return loopdev
     # -a add partition devmappings
@@ -484,8 +486,8 @@ def unfile_to_loop_kpartx(loopdev):
     subprocess.call(['kpartx', '-dv', '-pp', loopdev],
                     stdout=open(os.devnull, 'wb'))
     unfile_to_loop(loopdev)
-    
-    
+
+
 
 # Associate vmsysfile to a loop device and use fdisk to change partition table.
 try:
@@ -500,7 +502,7 @@ try:
     if p1_info[1] != '*':
         p1_start_sec = p1_info[1]
     else:
-        p1_start_sec = p1_info[2]  
+        p1_start_sec = p1_info[2]
 
     # This string will passed to fdisk, and this will change the partition's
     # last sector number to maximum.
@@ -509,7 +511,7 @@ try:
     c1 = subprocess.Popen(['echo', '-e', fdisk_string], stdout=subprocess.PIPE)
     c2 = subprocess.Popen(['fdisk', '-u', loopdev], stdin=c1.stdout,
                            stdout=open(os.devnull, 'wb'),
-                           stderr=subprocess.STDOUT) 
+                           stderr=subprocess.STDOUT)
     c1.wait()
     c2.wait()
 except:
@@ -523,24 +525,24 @@ finally:
 #       Reisze file system          #
 #####################################
 
-# Reassociate vmsysfile to a loop device and create device maps, 
+# Reassociate vmsysfile to a loop device and create device maps,
 # then use resize2fs to grow file system.
 try:
     loopdev = file_to_loop_kpartx(vmsysfile)
     loopmap = "/dev/mapper/" + loopdev.split('/')[-1] + "p1"
 
     logger.debug("Begin to pre check before resize.")
-    subprocess.call(['e2fsck', '-fy', loopmap], 
+    subprocess.call(['e2fsck', '-fy', loopmap],
                      stdout=open(os.devnull, 'wb'),
                      stderr=subprocess.STDOUT)
-    
+
     logger.debug("Begin to resize.")
-    subprocess.call(['resize2fs', loopmap], 
+    subprocess.call(['resize2fs', loopmap],
                      stdout=open(os.devnull, 'wb'),
                      stderr=subprocess.STDOUT)
-    
+
     logger.debug("Begin to post check after resize.")
-    subprocess.call(['e2fsck', '-fy', loopmap], 
+    subprocess.call(['e2fsck', '-fy', loopmap],
                      stdout=open(os.devnull, 'wb'),
                      stderr=subprocess.STDOUT)
 except:
@@ -585,7 +587,7 @@ try:
     for index,netitem in enumerate(args.vmnet):
         if_name = "eth" + str(index)
         if_file = mountpoint + "/etc/sysconfig/network-scripts/ifcfg-" + if_name
-        
+
         if_ip = netitem.split('/')[1]
         if_mask = netitem.split('/')[2]
 
@@ -598,31 +600,31 @@ try:
             if_ip = if_network.ip
             if_mask = if_network.netmask
             # if_prefixlen = if_network.prefixlen
-    
+
         if_file_content = ("DEVICE={0}\nTYPE=Ethernet\nONBOOT=yes\n"
                            "BOOTPROTO=static\nIPADDR={1}\nNETMASK={2}\n")
         with open(if_file, 'w') as f:
             f.write(if_file_content.format(if_name, if_ip, if_mask))
-        
+
     network_file = mountpoint + "/etc/sysconfig/network"
     network_file_content = ("NETWORKING=yes\nHOSTNAME={0}\nNOZEROCONF=yes\n")
     with open(network_file, 'w') as f:
         f.write(network_file_content.format(args.vmname))
-    
+
     if args.vmgateway:
         with open(network_file, 'a') as f:
             f.write("GATEWAY={0}\n".format(args.vmgateway))
-    
+
     resolv_file = mountpoint + "/etc/resolv.conf"
     if args.vmnameserver:
         for ns in args.vmnameserver.split(','):
             with open(resolv_file, 'a') as f:
                 f.write("nameserver {0}\n".format(ns))
-    
+
     ssh_dir = mountpoint + "/root/.ssh"
     auth_file = ssh_dir + "/authorized_keys"
     rclocal_file = mountpoint + "/etc/rc.local"
-    
+
     if args.pubkey:
         if not os.path.exists(ssh_dir):
             os.mkdir(ssh_dir, 0700)
@@ -633,16 +635,16 @@ try:
 
         # If authroized_keys does not exist, the security context of this file
         # created by this script is not corrected, so we need to restorecon it
-        # after the start of system. 
+        # after the start of system.
         with open(rclocal_file, 'a') as f:
             f.write("restorecon -R /root/.ssh\n")
-    
-    
+
+
 finally:
     logger.debug("Umount the temporary directory.")
     subprocess.call(['umount', mountpoint])
     unfile_to_loop_kpartx(loopdev)
-        
+
 # Start VM
 logger.debug("Start VM.")
 subprocess.call(['virsh', 'define', vmxmlfile])

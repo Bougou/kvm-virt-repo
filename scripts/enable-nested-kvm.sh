@@ -11,7 +11,7 @@ check_nested_kvm () {
     return 0
   fi
 }
-  
+
 enable_nested_kvm() {
   echo "Enabling KVM Nested."
 
@@ -21,7 +21,7 @@ options kvm_intel nested=1
 EOF
   rmmod kvm_intel
   modprobe kvm_intel
-  
+
   ## AMD
   cat <<EOF > /etc/modprobe.d/kvm_amd.conf
 options kvm_amd nested=1
@@ -34,11 +34,10 @@ if ! check_nested_kvm; then
   enable_nested_kvm && check_nested_kvm
 fi
 
-cat <<EOF 
+cat <<EOF
 Note:
   After enable kvm nested features.
   The VM started on the KVM Hypervisor should use the following cpu definition.
   <cpu mode='host-passthrough'>
   </cpu>
 EOF
-

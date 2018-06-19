@@ -47,4 +47,3 @@ sed -i -e "
 
 # Start libvirtd
 systemctl restart libvirtd
-
