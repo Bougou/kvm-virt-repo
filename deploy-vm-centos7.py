@@ -182,13 +182,19 @@ args = parser.parse_args()
 
 base_dir = os.path.dirname(__file__)
 
-if not os.path.isabs(args.vmdeploypath):
+if os.path.isabs(args.vmdeploypath):
+    vmdeploypath = args.vmdeploypath
+else:
     vmdeploypath = os.path.join(base_dir, args.vmdeploypath)
 
-if not os.path.isabs(args.vmtmplpath):
+if os.path.isabs(args.vmtmplpath):
+    vmtmplpath = args.vmtmplpath
+else:
     vmtmplpath = os.path.join(base_dir, args.vmtmplpath)
 
-if not os.path.isabs(args.vmcreatelogdir):
+if os.path.isabs(args.vmcreatelogdir):
+    vmcreatelogdir = args.vmcreatelogdir
+else:
     vmcreatelogdir = os.path.join(base_dir, args.vmcreatelogdir)
 
 if args.vmswapsize is None:
@@ -618,9 +624,13 @@ try:
         if not os.path.exists(ssh_dir):
             os.mkdir(ssh_dir, 0700)
 
-        for keyfile in args.pubkey.split(','):
-            with open(auth_file, 'a') as f:
+        with open(auth_file, 'a') as f:
+            for keyfile in args.pubkey.split(','):
+                if not os.path.isabs(keyfile):
+                    keyfile = os.path.join(base_dir, keyfile)
+
                 f.write(open(keyfile, 'r').read() + '\n')
+
 
         # If authroized_keys does not exist, the security context of this file
         # created by this script is not corrected, so we need to restorecon it
