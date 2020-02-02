@@ -18,22 +18,22 @@ cat <<EOF
 Usage: $0 -j <jump1-ip> -j <jump2-ip> -t <target>
 
 Options:
- -h                 Print this help message.
+  -h                 Print this help message.
 
- -t <target>        The target is in format <kvm-host-ip>:<vnc-port>
+  -t <target>        The target is in format <kvm-host-ip>:<vnc-port>
                     The <kvm-host-ip> is where the virtual machine resides.
                     The <vnc-port> is a port listened on the KVM host for the virtual machine's console.
                     This vnc port can be obtained on KVM host through 'virsh vncdisplay <vm>'
 
- -j <jump-ip>       The ip of the intermidiate machine. 
+  -j <jump-ip>       The ip of the intermidiate machine.
                     You can specify this option many times if there are more than one intermediate machine.
 EOF
 
 echo -e $color_red
-cat <<EOF 
+cat <<EOF
 Examples:
 
- $ $0 -j root@10.3.254.100 -j root@12.13.14.15 -j root@16.17.18.19 -t 192.168.8.29:5903
+  $ $0 -j root@10.3.254.100 -j root@12.13.14.15 -j root@16.17.18.19 -t 192.168.8.29:5903
 EOF
 echo -e $color_no
 }
@@ -64,7 +64,7 @@ cmd_str="ssh -tL 0.0.0.0:15900:localhost:15900 $JUMP1"
 # handle 'the scecond' to 'the second last' jump host.
 i=2
 j=$((jump_index-1))
-while [[ $i -le $j ]]; do 
+while [[ $i -le $j ]]; do
     var_tmp="JUMP$i"
     JUMP_HOST=$(eval echo \$$var_tmp)
     cmd_str=${cmd_str}" ssh -L localhost:15900:localhost:15900 $JUMP_HOST "
@@ -80,4 +80,3 @@ echo $cmd_str
 
 eval $cmd_str
 echo -e "${color_red}!!! Remember 'exit' the terminal to close connection when finished.${color_no}"
-
